@@ -13,13 +13,16 @@ return new class extends Migration
     {
         Schema::create('tags_products', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('tag_id');
-            $table->unsignedInteger('product_id');
+            $table->unsignedBigInteger('tag_id');
+            $table->unsignedBigInteger('product_id');
+            
             $table->foreign('tag_id')->references('id')->on('tags')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade')->onUpdate('cascade');
+            
             $table->timestamps();
         });
     }
+    
 
     /**
      * Reverse the migrations.
