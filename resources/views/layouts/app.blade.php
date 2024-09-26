@@ -17,16 +17,16 @@
     <header>
         <!-- navbar -->
 		<nav class="flex justify-between items-center bg-gray-800 text-white p-4">
-			<a href="{{ route('home') }}" class="text-2xl font-semibold">My Portfolio</a>
+			<a href="" class="text-2xl font-semibold">My Portfolio</a>
 			<ul class="flex space-x-4">
 				<li>
-					<a href="{{ route('home') }}" class="hover:underline">Home</a>
+					<a href="" class="hover:underline">Home</a>
 				</li>
 				<li>
-					<a href="{{ route('about') }}" class="hover:underline">About</a>
+					<a href="" class="hover:underline">About</a>
 				</li>
 				<li>
-					<a href="{{ route('services') }}" class="hover:underline">Services</a>
+					<a href="" class="hover:underline">Services</a>
 				</li>
 			</ul>
 		</nav>
