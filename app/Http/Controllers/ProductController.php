@@ -19,4 +19,10 @@ class ProductController extends Controller
         $dataProduct = Product::get();
         return view('admin.productpage', compact('dataProduct'));
     }
+
+    public function showProductList(): View
+    {
+        $dataProduct = Product::get();
+        return view('admin.productlist', compact('dataProduct'));
+    }
 }

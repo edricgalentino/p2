@@ -8,9 +8,15 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1>Product List</h1>
-        <a href="{{ url('/product/add') }}"><button class="btn btn-danger">Add Product</button></a>
-        <ul class="list-group">
+        <h1>What Do You Want?</h1>
+        
+        <!-- Button Show Product List -->
+        <a href="{{ url('/product/list') }}"><button class="btn btn-primary">Show Product List</button></a>
+
+        <!-- Button Add Product -->
+        <a href="{{ url('/product/add') }}"><button class="btn btn-danger ml-2">Add Product</button></a>
+
+        <ul class="list-group mt-3">
             @foreach ($dataProduct as $item)
                 <li class="list-group-item">
                     <strong>{{ $item->name }}</strong> - {{ $item->tags->pluck('name')->implode(', ') }}
