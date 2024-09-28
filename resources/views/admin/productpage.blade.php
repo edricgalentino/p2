@@ -16,18 +16,6 @@
         <!-- Button Add Product -->
         <a href="{{ url('/product/add') }}"><button class="btn btn-danger ml-2">Add Product</button></a>
 
-        <ul class="list-group mt-3">
-            @foreach ($dataProduct as $item)
-                <li class="list-group-item">
-                    <strong>{{ $item->name }}</strong> - {{ $item->tags->pluck('name')->implode(', ') }}
-                    <ul class="list-group mt-2">
-                        @foreach($item->tags as $item2)
-                            <li class="list-group-item">{{ $item2->name }}</li>
-                        @endforeach
-                    </ul>
-                </li>
-            @endforeach
-        </ul>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
