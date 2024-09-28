@@ -27,7 +27,9 @@
             @foreach ($dataProduct as $item)
                 <div class="col-md-4"> <!-- Change this to col-md-3 for 4 columns -->
                     <div class="product-card">
-                        <img src="{{ $item->photos->first()->url ?? 'default_image.jpg' }}" alt="{{ $item->name }}" class="product-img">
+                        <img src="{{ 
+                            asset('storage/' . $item->image)
+                            }}" alt="{{ $item->name }}" class="product-img">
                         <h5 class="mt-2">{{ $item->name }}</h5>
                         <p><strong>Condition:</strong> {{ ucfirst($item->condition) }}</p>
                         <p><strong>Description:</strong> {{ $item->description }}</p>

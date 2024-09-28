@@ -4,7 +4,9 @@ use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 
+Route::post('/product/add', [ProductController::class, 'addProduct']);
 Route::get('/product/add', [ProductController::class, 'showAddPage']);
+
 
 Route::get('/product', [ProductController::class, 'showlistPage']);
 

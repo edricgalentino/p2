@@ -9,12 +9,12 @@
 <body>
     <div class="container mt-5">
         <h1>Add Product</h1>
-        <form action="{{ url('/product') }}" method="POST" enctype="multipart/form-data" class="mb-4">
+        <form action="{{ url('/product/add') }}" method="POST" enctype="multipart/form-data" class="mb-4">
             @csrf
             <!-- Product Photos -->
             <div class="form-group">
                 <label for="photos">Product Photos:</label>
-                <input type="file" name="photos[]" class="form-control" id="photos" multiple>
+                <input type="file" name="photos" class="form-control" id="photos" multiple>
             </div>
             
             <!-- Product Name -->

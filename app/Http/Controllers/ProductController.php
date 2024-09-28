@@ -14,6 +14,30 @@ class ProductController extends Controller
         return view('admin.productaddpage');
     }
 
+    public function addProduct(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $request->validate([
+            'name' => 'required',
+            'price' => 'required',
+            'description' => 'required',
+            'photos' => 'required'
+        ]);
+        $product = new Product();
+        $product->name = $request->name;
+        $product->price = $request->price;
+        $product->description = $request->description;
+
+        if ($request->hasFile(key: 'photos')) {
+            $imagePth = $request->file(key: 'photos')->store('images', 'public');
+        } else {
+            return back()->with('error', 'No file selected');
+        }
+        $product->image = $imagePth;
+
+        $product->save();
+        return redirect('/product');
+    }
+
     public function showlistPage(): View
     {
         $dataProduct = Product::get();
@@ -23,6 +47,6 @@ class ProductController extends Controller
     public function showProductList(): View
     {
         $dataProduct = Product::get();
-        return view('admin.productlist', compact('dataProduct'));
+        return view('admin.productlistpage', compact('dataProduct'));
     }
 }
