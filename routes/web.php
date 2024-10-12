@@ -23,3 +23,5 @@ Route::get('/app', function () {
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::delete('/delete-produk/{id}', [ProductController::class, 'deleteProduct']);

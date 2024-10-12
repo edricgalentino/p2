@@ -55,6 +55,7 @@ class ProductController extends Controller
         return view('admin.productlistpage', compact('dataProduct'));
     }
 
+
     public function detailProduct($id): View
     {
         $dataProduct = Product::find($id);
@@ -73,5 +74,5 @@ class ProductController extends Controller
             return redirect('/product/list')->with('error', 'Product not found');
         }
     }
-    
+
 }
