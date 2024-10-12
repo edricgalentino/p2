@@ -9,9 +9,8 @@ class Product extends Model
 {
 	use HasFactory;
 
-	// protected $fillable = ['name', 'description', 'price', 'image'];
-	protected $guarded = [];
-
+	protected $fillable = ['name', 'description', 'price', 'image', 'stock', 'year', 'condotion'];
+	
 	public function tags()
 	{
 		return $this->belongsToMany(Tag::class, 'tags_products');
