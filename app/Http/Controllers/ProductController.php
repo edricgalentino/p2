@@ -82,6 +82,14 @@ class ProductController extends Controller
         return redirect('/product/list');
     }
 
+    public function deleteProduct($id): \Illuminate\Http\RedirectResponse
+    {
+        $product = Product::find($id);
+        Storage::disk('public')->delete($product->image);
+        $product->delete();
+        return redirect('/product');
+    }
+
     public function showlistPage(): View
     {
         $dataProduct = Product::get();
@@ -92,5 +100,11 @@ class ProductController extends Controller
     {
         $dataProduct = Product::get();
         return view('admin.productlistpage', compact('dataProduct'));
+    }
+
+    public function detailProduct($id): View
+    {
+        $dataProduct = Product::find($id);
+        return view('admin.detailproduct', compact('dataProduct'));
     }
 }
