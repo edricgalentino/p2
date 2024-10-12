@@ -54,4 +54,24 @@ class ProductController extends Controller
         $dataProduct = Product::get();
         return view('admin.productlistpage', compact('dataProduct'));
     }
+
+    public function detailProduct($id): View
+    {
+        $dataProduct = Product::find($id);
+        return view('admin.detailproduct', compact('dataProduct'));
+    }
+
+    public function deleteProduct($id)
+    {
+    
+        $product = Product::find($id);
+    
+        if ($product) {
+            $product->delete();
+            return redirect('/product/list')->with('success', 'Product deleted successfully');
+        } else {
+            return redirect('/product/list')->with('error', 'Product not found');
+        }
+    }
+    
 }

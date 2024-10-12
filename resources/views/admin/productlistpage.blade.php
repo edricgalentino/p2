@@ -35,7 +35,9 @@
                         <p><strong>Description:</strong> {{ $item->description }}</p>
                         <p><strong>Price:</strong> Rp{{ number_format($item->price, 2) }}</p>
                         <a href="{{url('/edit-product')}}"><button type="button" class="btn btn-primary">Edit</button></a>
-                        <a href="{{url('/delete-product')}}"><button type="button" class="btn btn-danger">Delete</button></a>
+                        <a href="{{url('/delete-product/' . $item->id)}}" class="btn btn-danger" 
+                            onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
+                        
                         <a href="{{url('/detail-product')}}"><button type="button" class="btn btn-success">Detail</button></a>
                         
                     </div>
