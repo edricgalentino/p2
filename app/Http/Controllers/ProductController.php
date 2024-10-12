@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProductController extends Controller
@@ -36,11 +37,49 @@ class ProductController extends Controller
         $product->image = $imagePth;
 
         $product->stock = $request->stock;
-        $product->year = $request->year;
+        $product->year = $request->year_created;
         $product->condition = $request->condition;
 
         $product->save();
         return redirect('/product');
+    }
+
+    public function editProductView($id): View
+    {
+        $product = Product::find($id);
+        return view('admin.producteditpage', compact('product'));
+    }
+
+    public function editProduct(Request $request, $id): \Illuminate\Http\RedirectResponse
+    {
+        $request->validate([
+            'name' => 'required',
+            'price' => 'required',
+            'description' => 'required',
+            'photos' => 'required'
+        ]);
+
+        $product = Product::find($id);
+        $product->name = $request->name;
+        $product->price = $request->price;
+        $product->description = $request->description;
+
+        if ($request->hasFile(key: 'photos')) {
+            $imagePth = $request->file(key: 'photos')->store('images', 'public');
+
+            //delete old image
+            Storage::disk('public')->delete($product->image);
+        } else {
+            return back()->with('error', 'No file selected');
+        }
+        $product->image = $imagePth;
+
+        $product->stock = $request->stock;
+        $product->year = $request->year_created;
+        $product->condition = $request->condition;
+
+        $product->save();
+        return redirect('/product/list');
     }
 
     public function showlistPage(): View

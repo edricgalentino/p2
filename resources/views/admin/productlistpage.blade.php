@@ -34,6 +34,14 @@
                         <p><strong>Condition:</strong> {{ ucfirst($item->condition) }}</p>
                         <p><strong>Description:</strong> {{ $item->description }}</p>
                         <p><strong>Price:</strong> Rp{{ number_format($item->price, 2) }}</p>
+                        <div class="d-flex justify-content-end w-full align-items-center">
+                            <a href="{{ url('/product/' . $item->id . '/edit') }}"><button class="btn btn-primary">Edit</button></a>
+                            <form action="{{ url('/product/' . $item->id . '/delete') }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger mx-4">Delete</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             @endforeach
