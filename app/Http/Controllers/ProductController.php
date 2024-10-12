@@ -37,7 +37,7 @@ class ProductController extends Controller
 
         $product->stock = $request->stock;
         $product->year = $request->year;
-        $product->stock = $request->stock;
+        $product->condition = $request->condition;
 
         $product->save();
         return redirect('/product');
