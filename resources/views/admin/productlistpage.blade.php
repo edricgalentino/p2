@@ -34,7 +34,10 @@
                         <p><strong>Condition:</strong> {{ ucfirst($item->condition) }}</p>
                         <p><strong>Description:</strong> {{ $item->description }}</p>
                         <p><strong>Price:</strong> Rp{{ number_format($item->price, 2) }}</p>
-                        <p><a href="{{url('/edit-product')}}"><button>Edit</button></a>
+                        <a href="{{url('/edit-product')}}"><button>Edit</button></a>
+                        <a href="{{url('/delete-product')}}"><button>Delete</button></a>
+                        <a href="{{url('/detail-product')}}"><button>Detail</button></a>
+                        
                     </div>
                 </div>
             @endforeach
