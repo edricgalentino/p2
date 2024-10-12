@@ -22,6 +22,7 @@ class ProductController extends Controller
             'description' => 'required',
             'photos' => 'required'
         ]);
+
         $product = new Product();
         $product->name = $request->name;
         $product->price = $request->price;
@@ -33,6 +34,9 @@ class ProductController extends Controller
             return back()->with('error', 'No file selected');
         }
         $product->image = $imagePth;
+
+        $product->stock = $request->stock;
+        $product->year = $request->year;
 
         $product->save();
         return redirect('/product');
