@@ -39,7 +39,7 @@
                             <form action="{{ url('/product/' . $item->id . '/delete') }}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger mx-4">Delete</button>
+                                <button type="submit" class="btn btn-danger ml-4">Delete</button>
                             </form>
                         </div>
                     </div>
