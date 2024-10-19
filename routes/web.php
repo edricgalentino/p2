@@ -6,8 +6,8 @@ use App\Http\Controllers\ProductController;
 Route::post('/product/add', [ProductController::class, 'addProduct']);
 Route::get('/product/add', [ProductController::class, 'showAddPage']);
 
-Route::patch('/product/{id}/edit', [ProductController::class, 'editProduct']);
 Route::get('/product/{id}/edit', [ProductController::class, 'editProductView']);
+Route::patch('/product/{id}/edit', [ProductController::class, 'editProduct']);
 
 Route::delete('/product/{id}/delete', [ProductController::class, 'deleteProduct']);
 

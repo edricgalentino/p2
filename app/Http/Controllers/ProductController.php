@@ -56,7 +56,6 @@ class ProductController extends Controller
             'name' => 'required',
             'price' => 'required',
             'description' => 'required',
-            'photos' => 'required'
         ]);
 
         $product = Product::find($id);
@@ -70,7 +69,7 @@ class ProductController extends Controller
             //delete old image
             Storage::disk('public')->delete($product->image);
         } else {
-            return back()->with('error', 'No file selected');
+            $imagePth = $product->image;
         }
         $product->image = $imagePth;
 

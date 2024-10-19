@@ -14,7 +14,7 @@
             <!-- Product Photos -->
             <div class="form-group">
                 <label for="photos">Product Photos:</label>
-                <input type="file" name="photos" class="form-control" id="photos" multiple>
+                <input type="file" name="photos" class="form-control" id="photos" multiple accept="image/*">
             </div>
             
             <!-- Product Name -->
