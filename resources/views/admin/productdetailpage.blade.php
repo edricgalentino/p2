@@ -57,7 +57,9 @@
             </div>
 
             <div class="d-flex justify-content-end w-full align-items-center">
+                @if(Auth::check() && (Auth::user()->role == 'visitor' || Auth::user()->role == 'admin'))    
                 <a href="{{ route('downloadimage', ['id' => $product->id]) }}" class="btn btn-primary">Download</a>
+                @endif
                 <!-- Back Button -->
                 <a href="{{ route('product.list') }}" class="btn btn-secondary">Back</a>
             </div>
