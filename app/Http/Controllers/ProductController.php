@@ -103,7 +103,19 @@ class ProductController extends Controller
 
     public function detailProduct($id): View
     {
-        $dataProduct = Product::find($id);
-        return view('admin.detailproduct', compact('dataProduct'));
+        $product = Product::find($id);
+        return view('admin.productdetailpage', compact('product'));
+    }
+
+    public function downloadImage($id)
+    {
+        $product = Product::find($id);
+        $path = storage_path('app/public/' . $product->image);
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        return response()->download($path);
     }
 }
