@@ -16,13 +16,13 @@ class AuthController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
- 
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-     
+
             return redirect()->route('landing');
         }
- 
+
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
@@ -35,24 +35,24 @@ class AuthController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
- 
+
         $user = User::create($credentials);
- 
+
         Auth::login($user);
- 
+
         $request->session()->regenerate();
- 
+
         return redirect()->route('landing');
     }
 
     public function logout(): RedirectResponse
     {
         Auth::logout();
- 
+
         request()->session()->invalidate();
- 
+
         request()->session()->regenerateToken();
- 
+
         return redirect()->route('landing');
     }
 

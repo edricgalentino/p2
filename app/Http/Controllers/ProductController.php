@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
@@ -28,6 +29,15 @@ class ProductController extends Controller
         $product->name = $request->name;
         $product->price = $request->price;
         $product->description = $request->description;
+        $arrayTags = explode(',', $request->tags);
+        for ($i = 0; $i < count($arrayTags); $i++) {
+            $tag = new Tag();
+            $tag->name = $arrayTags[$i];
+            $tag->product_id = $product->id;
+            $tag->save();
+        }
+        $tags = Tag::where('product_id', $product->id)->get();
+        $product->tags()->sync($tags);
 
         if ($request->hasFile(key: 'photos')) {
             $imagePth = $request->file(key: 'photos')->store('images', 'public');
@@ -62,6 +72,16 @@ class ProductController extends Controller
         $product->name = $request->name;
         $product->price = $request->price;
         $product->description = $request->description;
+        $arrayTags = explode(',', $request->tags);
+        $product->save();
+        for ($i = 0; $i < count($arrayTags); $i++) {
+            $tag = new Tag();
+            $tag->name = $arrayTags[$i];
+            $tag->product_id = $product->id;
+            $tag->save();
+        }
+        $tags = Tag::where('product_id', $product->id)->get();
+        $product->tags()->sync($tags);
 
         if ($request->hasFile(key: 'photos')) {
             $imagePth = $request->file(key: 'photos')->store('images', 'public');

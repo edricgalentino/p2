@@ -55,6 +55,22 @@
                 <label for="stock">Stock:</label>
                 <input type="number" name="stock" class="form-control" id="stock" required>
             </div>
+            
+            {{-- input to add dataTag --}}
+            <div class="form-group">
+                <label for="newTag">Add New Tag:</label>
+                <input type="text" name="newTag" class="form-control" id="newTag" placeholder="Tap '/' to input new tag">
+            </div>
+
+            {{-- tags --}}
+            <div class="form-group">
+                <label for="tags">Tags:</label>
+                <select name="tags" class="form-control" id="tags" multiple required>
+                    <option value="0" disabled>
+                        Please select tags or add new tag
+                    </option>
+                </select>
+            </div>
 
             <!-- Submit Button -->
             <button type="submit" class="btn btn-primary">Submit</button>
@@ -64,6 +80,47 @@
         <a href="{{ url('/product') }}" class="btn btn-secondary">Back</a>
     </div>
 
+    <script>
+        // init dataTag and fill it with function addNewTag
+        let dataTag = [];
+
+        document.getElementById("newTag").addEventListener("keyup", function(event) {
+            // every time user press tab, it will add new tag
+            if (event.keyCode === 16) {
+                event.preventDefault();
+                addNewTag();
+            }
+        });
+
+        // create a function to add new tag
+        function addNewTag() {
+            // get newTag value
+            var newTag = document.getElementById("newTag").value;
+
+            // check if newTag is not empty
+            if (newTag != "") {
+                if (dataTag.some(tag => tag.name === newTag)) {
+                    alert("Tag already exists!");
+                    return;
+                }
+                // push newTag to dataTag
+                dataTag.push({
+                    name: newTag
+                });
+
+                // create new option element
+                var option = document.createElement("option");
+                option.text = newTag;
+                option.value = newTag;
+
+                // append new option to select element
+                document.getElementById("tags").add(option);
+
+                // clear newTag value
+                document.getElementById("newTag").value = "";
+            }
+        }
+    </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

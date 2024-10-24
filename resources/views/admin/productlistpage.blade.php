@@ -22,10 +22,14 @@
                         <p><strong>Condition:</strong> {{ ucfirst($item->condition) }}</p>
                         <p><strong>Description:</strong> {{ $item->description }}</p>
                         <p><strong>Price:</strong> Rp{{ number_format($item->price, 2) }}</p>
+                        @foreach ($item->tags as $tag)
+                            <span class="badge badge-primary">{{ $tag->name }}</span>   
+                        @endforeach
                         @if(Auth::check() && Auth::user()->role == 'admin')
-                        <div class="d-flex justify-content-end w-full align-items-center">
-                            <a href="{{ url('/product/' . $item->id . '/edit') }}"><button
-                                    class="btn btn-primary">Edit</button></a>
+                        <div class="d-flex justify-content-end w-full align-items-center mt-2">
+                            <a href="{{ url('/product/' . $item->id . '/edit') }}">
+                                <button class="btn btn-primary">Edit</button>
+                            </a>
                             <form action="{{ url('/product/' . $item->id . '/delete') }}" method="POST">
                                 @csrf
                                 @method('DELETE')

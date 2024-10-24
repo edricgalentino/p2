@@ -15,6 +15,10 @@
             <!-- Product Photos -->
             <div class="form-group">
                 <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" id="image-preview" class="mt-2" style="max-width: 200px;">
+                
+                @if(Auth::check() && (Auth::user()->role == 'visitor' || Auth::user()->role == 'admin'))    
+                <a href="{{ route('downloadimage', ['id' => $product->id]) }}" class="btn btn-primary">Download</a>
+                @endif
             </div>
 
             <!-- Product Name -->
@@ -57,9 +61,6 @@
             </div>
 
             <div class="d-flex justify-content-end w-full align-items-center">
-                @if(Auth::check() && (Auth::user()->role == 'visitor' || Auth::user()->role == 'admin'))    
-                <a href="{{ route('downloadimage', ['id' => $product->id]) }}" class="btn btn-primary">Download</a>
-                @endif
                 <!-- Back Button -->
                 <a href="{{ route('product.list') }}" class="btn btn-secondary">Back</a>
             </div>

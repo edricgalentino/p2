@@ -9,7 +9,10 @@
 <body>
     <div class="container mt-5">
         <h3>Edit {{ $product->name }}</h3>
-        <form action="{{ url('/product/' . $product->id . '/edit') }}" method="POST" enctype="multipart/form-data" class="mb-4">
+        <form action="{{ url('/product/' . $product->id . '/edit') }}" method="POST" enctype="multipart/form-data" class="mb-4" onkeydown="if(event.keyCode === 13) {
+            alert('You have pressed Enter key, use submit button instead'); 
+            return false;
+        }">
             @csrf
             @method('PATCH')
             <!-- Product Photos -->
@@ -59,6 +62,25 @@
                 <input type="number" name="stock" class="form-control" id="stock" required value="{{ $product->stock }}">
             </div>
 
+            {{-- input to add dataTag --}}
+            <div class="form-group">
+                <label for="newTag">Add New Tag:</label>
+                <input type="text" name="newTag" class="form-control" id="newTag" placeholder="Tap '/' to input new tag">
+            </div>
+
+            {{-- tags --}}
+            <div class="form-group">
+                <label for="tags">Tags:</label>
+                <select name="tags" class="form-control" id="tags" multiple required>
+                    <option value="0" disabled>
+                        Please select tags or add new tag
+                    </option>
+                    @foreach ($product->tags as $tag)
+                        <option value="{{ $tag->id }}" selected>{{ $tag->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="d-flex justify-content-end w-full align-items-center">
                 <!-- Back Button -->
                 <a href="{{ url('/product') }}" class="btn btn-secondary">Back</a>
@@ -70,6 +92,46 @@
     </div>
 
     <script>
+        // init dataTag and fill it with function addNewTag
+        let dataTag = [];
+
+        document.getElementById("newTag").addEventListener("keyup", function(event) {
+            // every time user press tab, it will add new tag
+            if (event.keyCode === 16) {
+                event.preventDefault();
+                addNewTag();
+            }
+        });
+
+        // create a function to add new tag
+        function addNewTag() {
+            // get newTag value
+            var newTag = document.getElementById("newTag").value;
+
+            // check if newTag is not empty
+            if (newTag != "") {
+                if (dataTag.some(tag => tag.name === newTag)) {
+                    alert("Tag already exists!");
+                    return;
+                }
+                // push newTag to dataTag
+                dataTag.push({
+                    name: newTag
+                });
+
+                // create new option element
+                var option = document.createElement("option");
+                option.text = newTag;
+                option.value = newTag;
+
+                // append new option to select element
+                document.getElementById("tags").add(option);
+
+                // clear newTag value
+                document.getElementById("newTag").value = "";
+            }
+        }
+
         // create a function to preview image
         function previewImage() {
             // get image file
