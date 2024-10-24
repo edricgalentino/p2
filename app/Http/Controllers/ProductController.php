@@ -2,18 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tag;
+use App\Services\TagService;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Tag;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProductController extends Controller
 {
-    //
-    public function showAddPage(): View
+    protected $tagService;
+
+    public function __construct(TagService $tagService)
     {
-        return view('admin.productaddpage');
+        $this->tagService = $tagService;
+    }
+    public function showAddPage()
+    {
+        $tags = Tag::all(); // Fetch all existing tags
+        return view('admin.productaddpage', compact('tags'));
     }
 
     public function addProduct(Request $request): \Illuminate\Http\RedirectResponse
@@ -22,22 +29,14 @@ class ProductController extends Controller
             'name' => 'required',
             'price' => 'required',
             'description' => 'required',
-            'photos' => 'required'
+            'photos' => 'required',
+            'tags' => 'required|array'
         ]);
 
         $product = new Product();
         $product->name = $request->name;
         $product->price = $request->price;
         $product->description = $request->description;
-        $arrayTags = explode(',', $request->tags);
-        for ($i = 0; $i < count($arrayTags); $i++) {
-            $tag = new Tag();
-            $tag->name = $arrayTags[$i];
-            $tag->product_id = $product->id;
-            $tag->save();
-        }
-        $tags = Tag::where('product_id', $product->id)->get();
-        $product->tags()->sync($tags);
 
         if ($request->hasFile(key: 'photos')) {
             $imagePth = $request->file(key: 'photos')->store('images', 'public');
@@ -51,13 +50,30 @@ class ProductController extends Controller
         $product->condition = $request->condition;
 
         $product->save();
+
+        $tagIds = [];
+        foreach ($request->tags as $tag) {
+            // If it's a numeric tag, mean it's an id not a new tag it's an existing tag
+            if (is_numeric($tag)) {
+                $tagIds[] = $tag;
+            } else {
+                // If it's not a numeric tag, it's a new tag name
+                $newTag = $this->tagService->createOrUpdateTags($tag);
+                $tagIds[] = $newTag->id;
+            }
+        }
+
+        // Attach the tag IDs to the product without removing existing relations
+        $product->tags()->sync($tagIds); // This will insert into the 'tags_products' table with the product_id and tag_id, don't ask me how it works, it's magic
+
         return redirect('/product');
     }
 
     public function editProductView($id): View
     {
         $product = Product::find($id);
-        return view('admin.producteditpage', compact('product'));
+        $tags = Tag::all(); // Fetch all existing tags
+        return view('admin.producteditpage', compact('product', 'tags'));
     }
 
     public function editProduct(Request $request, $id): \Illuminate\Http\RedirectResponse
@@ -72,16 +88,6 @@ class ProductController extends Controller
         $product->name = $request->name;
         $product->price = $request->price;
         $product->description = $request->description;
-        $arrayTags = explode(',', $request->tags);
-        $product->save();
-        for ($i = 0; $i < count($arrayTags); $i++) {
-            $tag = new Tag();
-            $tag->name = $arrayTags[$i];
-            $tag->product_id = $product->id;
-            $tag->save();
-        }
-        $tags = Tag::where('product_id', $product->id)->get();
-        $product->tags()->sync($tags);
 
         if ($request->hasFile(key: 'photos')) {
             $imagePth = $request->file(key: 'photos')->store('images', 'public');
@@ -98,6 +104,22 @@ class ProductController extends Controller
         $product->condition = $request->condition;
 
         $product->save();
+
+        $tagIds = [];
+        foreach ($request->tags as $tag) {
+            // If it's a numeric tag, mean it's an id not a new tag it's an existing tag
+            if (is_numeric($tag)) {
+                $tagIds[] = $tag;
+            } else {
+                // If it's not a numeric tag, it's a new tag name
+                $newTag = $this->tagService->createOrUpdateTags($tag);
+                $tagIds[] = $newTag->id;
+            }
+        }
+
+        // Attach the tag IDs to the product without removing existing relations
+        $product->tags()->sync($tagIds); // This will insert into the 'tags_products' table with the product_id and tag_id, don't ask me how it works, it's magic
+
         return redirect('/product/list');
     }
 

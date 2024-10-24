@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 
@@ -35,3 +36,5 @@ Route::middleware(['auth'])->group(function () {
 
 	Route::get('/product/download/{id}', [ProductController::class, 'downloadImage'])->name('downloadimage');
 });
+
+Route::post('/tags/create', [TagController::class, 'createTag']);

@@ -65,83 +65,69 @@
             {{-- input to add dataTag --}}
             <div class="form-group">
                 <label for="newTag">Add New Tag:</label>
-                <input type="text" name="newTag" class="form-control" id="newTag" placeholder="Tap '/' to input new tag">
+                <input type="text" name="newTag" class="form-control" id="newTag" placeholder="Press shift to add new tag">
             </div>
 
             {{-- tags --}}
-            <div class="form-group">
+           <div class="form-group">
                 <label for="tags">Tags:</label>
-                <select name="tags" class="form-control" id="tags" multiple required>
-                    <option value="0" disabled>
-                        Please select tags or add new tag
-                    </option>
-                    @foreach ($product->tags as $tag)
-                        <option value="{{ $tag->id }}" selected>{{ $tag->name }}</option>
+                <select name="tags[]" class="form-control" id="tags" multiple required>
+                    @foreach($tags as $tag)
+                        <option value="{{ $tag->id }}">{{ $tag->name }}</option>
                     @endforeach
                 </select>
             </div>
 
-            <div class="d-flex justify-content-end w-full align-items-center">
-                <!-- Back Button -->
-                <a href="{{ url('/product') }}" class="btn btn-secondary">Back</a>
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary ml-4">Submit</button>
-            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
         
+        <!-- Back Button -->
+        <a href="{{ url('/product') }}" class="btn btn-secondary">Back</a>
     </div>
 
-    <script>
-        // init dataTag and fill it with function addNewTag
-        let dataTag = [];
-
+   <script>
         document.getElementById("newTag").addEventListener("keyup", function(event) {
-            // every time user press tab, it will add new tag
-            if (event.keyCode === 16) {
+            if (event.keyCode === 16) { // Shift key is pressed
                 event.preventDefault();
                 addNewTag();
             }
         });
 
-        // create a function to add new tag
         function addNewTag() {
-            // get newTag value
-            var newTag = document.getElementById("newTag").value;
+            let newTag = document.getElementById("newTag").value;
 
-            // check if newTag is not empty
-            if (newTag != "") {
-                if (dataTag.some(tag => tag.name === newTag)) {
-                    alert("Tag already exists!");
-                    return;
-                }
-                // push newTag to dataTag
-                dataTag.push({
-                    name: newTag
-                });
-
-                // create new option element
-                var option = document.createElement("option");
-                option.text = newTag;
-                option.value = newTag;
-
-                // append new option to select element
-                document.getElementById("tags").add(option);
-
-                // clear newTag value
-                document.getElementById("newTag").value = "";
+            if (newTag.trim() === "") {
+                alert("Tag cannot be empty!");
+                return;
             }
+
+            // Send AJAX request to create the new tag
+            fetch('/tags/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ name: newTag })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let option = document.createElement("option");
+                    option.text = newTag;
+                    option.value = data.tag_id; // Set the newly created tag's ID
+                    option.selected = true;
+
+                    document.getElementById("tags").appendChild(option);
+                    document.getElementById("newTag").value = "";
+                } else {
+                    alert("Failed to add the tag!");
+                }
+            })
+            .catch(error => console.error('Error:', error));
         }
-
-        // create a function to preview image
-        function previewImage() {
-            // get image file
-            var oFReader = new FileReader();
-            oFReader.readAsDataURL(document.getElementById("photos").files[0]);
-
-            oFReader.onload = function(oFREvent) {
-                document.getElementById("image-preview").src = oFREvent.target.result;
-            };
-        };
     </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
