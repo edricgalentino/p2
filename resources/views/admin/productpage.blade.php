@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1>What Do You Want?</h1>
+        <h1>Ada yang ingin kamu tambahkan?</h1>
         
         <!-- Button Show Product List -->
         <a href="{{ route('product.list') }}"><button class="btn btn-primary">Show Product List</button></a>

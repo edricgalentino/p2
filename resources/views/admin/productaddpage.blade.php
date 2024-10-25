@@ -59,7 +59,7 @@
             {{-- input to add dataTag --}}
             <div class="form-group">
                 <label for="newTag">Add New Tag:</label>
-                <input type="text" name="newTag" class="form-control" id="newTag" placeholder="Press shift to add new tag">
+                <input type="text" name="newTag" class="form-control" id="newTag" value="#" placeholder="Press shift to add new tag">
             </div>
 
             {{-- tags --}}
@@ -92,7 +92,7 @@
         function addNewTag() {
             let newTag = document.getElementById("newTag").value;
 
-            if (newTag.trim() === "") {
+            if (newTag.trim() === "#") {
                 alert("Tag cannot be empty!");
                 return;
             }
@@ -115,7 +115,7 @@
                     option.selected = true;
 
                     document.getElementById("tags").appendChild(option);
-                    document.getElementById("newTag").value = "";
+                    document.getElementById("newTag").value = "#";
                 } else {
                     alert("Failed to add the tag!");
                 }
