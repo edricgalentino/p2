@@ -1,4 +1,3 @@
-<!-- create base model from images migration  2024_09_21_015952_create_images_table -->
 <?php
 
 namespace App\Models;

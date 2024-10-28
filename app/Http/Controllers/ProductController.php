@@ -17,7 +17,8 @@ class ProductController extends Controller
     {
         $this->tagService = $tagService;
     }
-    public function showAddPage()
+
+    public function showAddPage(): View
     {
         $tags = Tag::all(); // Fetch all existing tags
         return view('admin.productaddpage', compact('tags'));
@@ -37,36 +38,54 @@ class ProductController extends Controller
         $product->name = $request->name;
         $product->price = $request->price;
         $product->description = $request->description;
-
-        if ($request->hasFile(key: 'photos')) {
-            $imagePth = $request->file(key: 'photos')->store('images', 'public');
-        } else {
-            return back()->with('error', 'No file selected');
-        }
-        $product->image = $imagePth;
-
         $product->stock = $request->stock;
         $product->year = $request->year_created;
         $product->condition = $request->condition;
 
-        $product->save();
+        if ($request->hasFile('photos')) {
+            $product->image = $request->file('photos')[0]->store('images', 'public');
+            $product->save();
 
-        $tagIds = [];
-        foreach ($request->tags as $tag) {
-            // If it's a numeric tag, mean it's an id not a new tag it's an existing tag
-            if (is_numeric($tag)) {
-                $tagIds[] = $tag;
-            } else {
-                // If it's not a numeric tag, it's a new tag name
-                $newTag = $this->tagService->createOrUpdateTags($tag);
-                $tagIds[] = $newTag->id;
+            foreach ($request->file('photos') as $index => $photo) {
+                $photoEntity = $product->photos()->create(['url' => $photo->store('images', 'public'), 'product_id' => $product->id]);
+
+                $phototagIds = [];
+                $photoTags = $request->input('tags-' . $index, []);
+                foreach ($photoTags as $tag) {
+                    // If it's a numeric tag, mean it's an id not a new tag it's an existing tag
+                    if (is_numeric($tag)) {
+                        $phototagIds[] = $tag;
+                    } else {
+                        // If it's not a numeric tag, it's a new tag name
+                        $newTag = $this->tagService->createOrUpdateTags($tag);
+                        $phototagIds[] = $newTag->id;
+                    }
+                    echo "Tag: " . $tag . PHP_EOL;
+                }
+
+                // Attach the tag IDs to the photo
+                $photoEntity->tags()->sync($phototagIds);
             }
+
+            $tagIds = [];
+            foreach ($request->tags as $tag) {
+                // If it's a numeric tag, mean it's an id not a new tag it's an existing tag
+                if (is_numeric($tag)) {
+                    $tagIds[] = $tag;
+                } else {
+                    // If it's not a numeric tag, it's a new tag name
+                    $newTag = $this->tagService->createOrUpdateTags($tag);
+                    $tagIds[] = $newTag->id;
+                }
+            }
+
+            // Attach the tag IDs to the product without removing existing relations
+            $product->tags()->sync($tagIds); // This will insert into the 'tags_products' table with the product_id and tag_id, don't ask me how it works, it's magic
+        } else {
+            return back()->with('error', 'No file selected');
         }
 
-        // Attach the tag IDs to the product without removing existing relations
-        $product->tags()->sync($tagIds); // This will insert into the 'tags_products' table with the product_id and tag_id, don't ask me how it works, it's magic
-
-        return redirect('/product');
+        return redirect('/product/list');
     }
 
     public function editProductView($id): View
@@ -89,15 +108,48 @@ class ProductController extends Controller
         $product->price = $request->price;
         $product->description = $request->description;
 
-        if ($request->hasFile(key: 'photos')) {
-            $imagePth = $request->file(key: 'photos')->store('images', 'public');
+        if ($request->existing_photos != null && !$request->hasFile(key: 'photos')) {
+            foreach ($product->photos as $index => $photo) {
+                $phototagIds = [];
+                $photoTags = $request->input('photo-' . $photo->id . '-tags', []);
+                foreach ($photoTags as $tag) {
+                    // If it's a numeric tag, mean it's an id not a new tag it's an existing tag
+                    if (is_numeric($tag)) {
+                        $phototagIds[] = $tag;
+                    } else {
+                        // If it's not a numeric tag, it's a new tag name
+                        $newTag = $this->tagService->createOrUpdateTags($tag);
+                        $phototagIds[] = $newTag->id;
+                    }
+                }
 
-            //delete old image
-            Storage::disk('public')->delete($product->image);
+                // Attach the tag IDs to the photo
+                $photo->tags()->sync($phototagIds);
+            }
+        } else if ($request->hasFile(key: 'photos')) {
+            $product->image = $request->file('photos')[0]->store('images', 'public');
+            foreach ($request->file('photos') as $index => $newphoto) {
+                $photoEntity = $product->photos()->create(['url' => $newphoto->store('images', 'public'), 'product_id' => $product->id]);
+
+                $phototagIds = [];
+                $photoTags = $request->input('tags-' . $index, []);
+                foreach ($photoTags as $tag) {
+                    // If it's a numeric tag, mean it's an id not a new tag it's an existing tag
+                    if (is_numeric($tag)) {
+                        $phototagIds[] = $tag;
+                    } else {
+                        // If it's not a numeric tag, it's a new tag name
+                        $newTag = $this->tagService->createOrUpdateTags($tag);
+                        $phototagIds[] = $newTag->id;
+                    }
+                }
+
+                // Attach the tag IDs to the photo
+                $photoEntity->tags()->sync($phototagIds);
+            }
         } else {
-            $imagePth = $product->image;
+            return back()->withErrors(['error' => 'No file selected']);
         }
-        $product->image = $imagePth;
 
         $product->stock = $request->stock;
         $product->year = $request->year_created;
@@ -120,7 +172,7 @@ class ProductController extends Controller
         // Attach the tag IDs to the product without removing existing relations
         $product->tags()->sync($tagIds); // This will insert into the 'tags_products' table with the product_id and tag_id, don't ask me how it works, it's magic
 
-        return redirect('/product/list');
+        return redirect()->route('product.list');
     }
 
     public function deleteProduct($id): \Illuminate\Http\RedirectResponse
@@ -128,7 +180,7 @@ class ProductController extends Controller
         $product = Product::find($id);
         Storage::disk('public')->delete($product->image);
         $product->delete();
-        return redirect('/product');
+        return redirect('/product/list');
     }
 
     public function showlistPage(): View
