@@ -43,11 +43,8 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <img src="/storage/images/grateaful.png" alt="logo_Image" class="hero-image"> 
-        <h1>Discover the Beauty of Floral Teas</h1>
-        <p class="product-description">Indulge in a variety of exquisite floral teas that will bring harmony to your senses and refresh your mind. Hand-picked and crafted to perfection.</p>
-
+    <div class="container mt-5">
+        <h1>Ada yang ingin kamu tambahkan?</h1>
         
         <!-- Button Show Product List -->
         <a href="{{ route('product.list') }}"><button class="btn btn-primary">Show Product List</button></a>
