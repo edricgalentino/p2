@@ -9,11 +9,17 @@ class Photo extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_id', 'url']; // Allow mass assignment for these attributes
+    // protected $fillable = ['product_id', 'url'];
+    protected $guarded = []; // Allow mass assignment for all attributes
 
     // Define the relationship with Product
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, "photo_tags");
     }
 }

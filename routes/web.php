@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PhotoController;
 
 
 Route::get('/product', [ProductController::class, 'showlistPage'])->name('landing');
@@ -25,7 +26,7 @@ Route::post('/login', [AuthController::class, 'authenticate'])->name('authentica
 Route::middleware(['auth'])->group(function () {
 
 	Route::get('/product/{id}/edit', [ProductController::class, 'editProductView']);
-	Route::patch('/product/{id}/edit', [ProductController::class, 'editProduct']);
+	Route::put('/product/{id}/edit', [ProductController::class, 'editProduct']);
 
 	Route::delete('/product/{id}/delete', [ProductController::class, 'deleteProduct']);
 
@@ -35,6 +36,8 @@ Route::middleware(['auth'])->group(function () {
 	Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 	Route::get('/product/download/{id}', [ProductController::class, 'downloadImage'])->name('downloadimage');
+
+	Route::delete('/photo/{id}', [PhotoController::class, 'deletePhoto']);
 });
 
 Route::post('/tags/create', [TagController::class, 'createTag']);

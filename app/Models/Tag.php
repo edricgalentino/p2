@@ -20,4 +20,9 @@ class Tag extends Model
 	{
 		return $this->belongsToMany(Image::class);
 	}
+
+	public function photos()
+	{
+		return $this->belongsToMany(Photo::class);
+	}
 }

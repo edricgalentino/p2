@@ -4,84 +4,131 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Detail</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #d8f3dc;
+            color: #3c3b3b;
+            font-family: Arial, sans-serif;
+        }
+
+        .card {
+            border: none;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px; /* Lebar card terbatas */
+            margin: auto; /* Pusatkan card di halaman */
+        }
+
+        .carousel-inner img {
+            height: 300px; /* Ukuran gambar yang lebih kecil */
+            object-fit: cover;
+        }
+
+        .card-body {
+            background-color: #f9f9f9;
+        }
+
+        h4.product-name {
+            color: #2d6a4f; /* Warna hijau untuk nama produk */
+            font-weight: bold;
+            font-size: 1.5rem; /* Ukuran font nama produk */
+        }
+
+        .btn-download {
+            font-size: 0.75rem; /* Ukuran font tombol lebih kecil */
+            padding: 4px 8px; /* Ukuran tombol lebih kecil */
+            margin-top: 10px;
+            display: inline-block; /* Agar tombol tidak memenuhi lebar */
+            width: auto; /* Mengatur lebar tombol otomatis */
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268; /* Warna saat hover */
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
-        <h3>{{ $product->name }} Details</h3>
-        <form action="{{ url('/product/' . $product->id . '/edit') }}" method="POST" enctype="multipart/form-data" class="mb-4">
-            @csrf
-            @method('PATCH')
-            <!-- Product Photos -->
-            <div class="form-group">
-                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" id="image-preview" class="mt-2" style="max-width: 200px;">
-                
-                @if(Auth::check() && (Auth::user()->role == 'visitor' || Auth::user()->role == 'admin'))    
-                <a href="{{ route('downloadimage', ['id' => $product->id]) }}" class="btn btn-primary">Download</a>
-                @endif
-            </div>
+        <div class="card">
+            <!-- Product Photos Carousel -->
+            <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    @foreach($product->photos as $index => $photo)
+                        <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                            <img src="{{ asset('storage/' . $photo->url) }}" alt="{{ $product->name }}" class="d-block w-100 img-fluid">
+                            <div class="position-absolute bottom-0 start-0 m-2">
+                                @foreach ($photo->tags as $tag)
+                                <span class="badge bg-danger">{{ $tag->name }}</span>
+                                @endforeach
+                            </div>
 
-            <!-- Product Name -->
-            <div class="form-group">
-                <label for="name">Product Name:</label>
-                <input type="text" name="name" class="form-control" id="name" required value="{{ $product->name }}" disabled>
+                        </div>
+                    @endforeach
+                    
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
             </div>
-            
-            <!-- Year Created -->
-            <div class="form-group">
-                <label for="year_created">Year Created:</label>
-                <input type="number" name="year_created" class="form-control" id="year_created" required value="{{ $product->year }}" disabled>
-            </div>
+            @if(Auth::check() && (Auth::user()->role == 'visitor' || Auth::user()->role == 'admin'))
+                <div class="text-center">
+                    <a href="#" onclick="downloadAllImages()" class="btn btn-primary btn-download">Download All Images</a>
+                </div>
+                <script>
+                    function downloadAllImages() {
+                        const images = @json($product->photos);
+                        images.forEach((photo) => {
+                            const link = document.createElement('a');
+                            link.href = `{{ asset('storage/') }}/${photo.url}`;
+                            link.download = photo.url.split('/').pop();
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        });
+                    }
+                </script>
+            @endif
 
-            <!-- Condition -->
-            <div class="form-group">
-                <label for="condition">Condition:</label>
-                <select name="condition" class="form-control" id="condition" required disabled>
-                    <option value="new" {{ $product->condition == 'new' ? 'selected' : '' }}>New</option>
-                    <option value="used" {{ $product->condition == 'used' ? 'selected' : '' }}>Used</option>
-                </select>
-            </div>
+            <!-- Product Information -->
+            <div class="card-body">
+                <!-- Product Name -->
+                <h4 class="product-name">{{ $product->name }}</h4>
 
-            <!-- Product Description -->
-            <div class="form-group">
-                <label for="description">Product Description:</label>
-                <textarea name="description" class="form-control" id="description" rows="3" required disabled>{{ $product->description }}</textarea>
-            </div>
+                <!-- Year Created -->
+                <p><strong>Year Created:</strong> {{ $product->year }}</p>
 
-            <!-- Price -->
-            <div class="form-group">
-                <label for="price">Price:</label>
-                <input type="text" name="price" class="form-control" id="price" required value="{{ $product->price }}" disabled>
-            </div>
+                <!-- Condition -->
+                <p><strong>Condition:</strong> {{ ucfirst($product->condition) }}</p>
 
-            <!-- Stock -->
-            <div class="form-group">
-                <label for="stock">Stock:</label>
-                <input type="number" name="stock" class="form-control" id="stock" required value="{{ $product->stock }}" disabled>
-            </div>
+                <!-- Product Description -->
+                <p><strong>Description:</strong> {{ $product->description }}</p>
 
-            <div class="d-flex justify-content-end w-full align-items-center">
-                <!-- Back Button -->
-                <a href="{{ route('product.list') }}" class="btn btn-secondary">Back</a>
+                <!-- Price -->
+                <p><strong>Price:</strong> Rp{{ number_format($product->price, 2) }}</p>
+
+                <!-- Stock -->
+                <p><strong>Stock:</strong> {{ $product->stock }} items available</p>
+
+                <div class="d-flex justify-content-end mt-3">
+                    <a href="{{ route('product.list') }}" class="btn btn-secondary">Back to Products List</a>
+                </div>
             </div>
-        </form>
-        
+        </div>
     </div>
 
-    <script>
-        // create a function to preview image
-        function previewImage() {
-            // get image file
-            var oFReader = new FileReader();
-            oFReader.readAsDataURL(document.getElementById("photos").files[0]);
-
-            oFReader.onload = function(oFREvent) {
-                document.getElementById("image-preview").src = oFREvent.target.result;
-            };
-        };
-    </script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
