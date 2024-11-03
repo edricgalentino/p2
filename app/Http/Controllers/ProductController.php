@@ -126,8 +126,51 @@ class ProductController extends Controller
                 // Attach the tag IDs to the photo
                 $photo->tags()->sync($phototagIds);
             }
-        } else if ($request->hasFile(key: 'photos')) {
+        } else if ($request->hasFile(key: 'photos') && $request->existing_photos != null) {
             $product->image = $request->file('photos')[0]->store('images', 'public');
+            $product->save();
+
+            foreach ($product->photos as $index => $photo) {
+                $phototagIds = [];
+                $photoTags = $request->input('photo-' . $photo->id . '-tags', []);
+                foreach ($photoTags as $tag) {
+                    // If it's a numeric tag, mean it's an id not a new tag it's an existing tag
+                    if (is_numeric($tag)) {
+                        $phototagIds[] = $tag;
+                    } else {
+                        // If it's not a numeric tag, it's a new tag name
+                        $newTag = $this->tagService->createOrUpdateTags($tag);
+                        $phototagIds[] = $newTag->id;
+                    }
+                }
+
+                // Attach the tag IDs to the photo
+                $photo->tags()->sync($phototagIds);
+            }
+
+            foreach ($request->file('photos') as $index => $newphoto) {
+                $photoEntity = $product->photos()->create(['url' => $newphoto->store('images', 'public'), 'product_id' => $product->id]);
+
+                $phototagIds = [];
+                $photoTags = $request->input('tags-' . $index, []);
+                foreach ($photoTags as $tag) {
+                    // If it's a numeric tag, mean it's an id not a new tag it's an existing tag
+                    if (is_numeric($tag)) {
+                        $phototagIds[] = $tag;
+                    } else {
+                        // If it's not a numeric tag, it's a new tag name
+                        $newTag = $this->tagService->createOrUpdateTags($tag);
+                        $phototagIds[] = $newTag->id;
+                    }
+                }
+
+                // Attach the tag IDs to the photo
+                $photoEntity->tags()->sync($phototagIds);
+            }
+        } else if ($request->hasFile(key: 'photos') && $request->existing_photos == null) {
+            $product->image = $request->file('photos')[0]->store('images', 'public');
+            $product->save();
+
             foreach ($request->file('photos') as $index => $newphoto) {
                 $photoEntity = $product->photos()->create(['url' => $newphoto->store('images', 'public'), 'product_id' => $product->id]);
 

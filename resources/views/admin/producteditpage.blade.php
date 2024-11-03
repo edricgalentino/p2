@@ -30,7 +30,7 @@
             <div class="form-group mb-4">
                 <label for="photos" class="form-label">Product Photos:</label>
                 <button type="button" class="btn btn-primary mb-2" onclick="document.getElementById('photos').click();">Select Images</button>
-                <input type="file" name="photos[]" class="form-control" id="photos" multiple accept="image/*" style="display: none;" onchange="handleFiles(this.files)">
+                <input type="file" name="photos[]" class="form-control" id="photos" multiple accept="image/*" style="display: none;" onchange="handleFiles(this.files, {{ json_encode($tags) }})">
                 @foreach($product->photos as $photo)
                 <input type="hidden" name="existing_photos[]" value="{{ $photo->id }}">
                 @endforeach
@@ -41,7 +41,7 @@
                     <div class="col-3 mb-3">
                         <div class="position-relative">
                             <img src="{{ asset('storage/' . $photo->url) }}" class="img-thumbnail" alt="{{ $product->name }} Product Image" id="photo-{{ $photo->id }}">
-                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" onclick="deleteImage('{{ $photo->id }}')">x</button>
+                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" onclick="deleteImage({{ $photo->id }})">x</button>
                         </div>
                     </div>
                     <div class="col">
@@ -179,18 +179,119 @@
 
         let selectedFiles = [];
 
-        function handleFiles(files) {
+        function handleFiles(files, tags) {
             const thumbnails = document.getElementById('thumbnails');
             const selectedFiles = Array.from(files); // Store files in array
 
-            selectedFiles.forEach(file => {
+            selectedFiles.forEach((file, index) => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = 'row';
+
+                    const col3Div = document.createElement('div');
+                    col3Div.className = 'col-3 mb-3';
+
+                    const positionRelativeDiv = document.createElement('div');
+                    positionRelativeDiv.className = 'position-relative';
+
                     const img = document.createElement('img');
                     img.src = e.target.result;
-                    img.className = 'img-thumbnail m-2';
+                    img.className = 'img-thumbnail';
+                    img.alt = 'Product Image';
                     img.style.width = '150px';
-                    thumbnails.appendChild(img);
+
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'btn btn-danger btn-sm position-absolute top-0 end-0';
+                    button.innerText = 'x';
+                    button.onclick = function() {
+                        const rowToRemove = button.closest('.row');
+                        rowToRemove.remove();
+                    };
+
+                    positionRelativeDiv.appendChild(img);
+                    positionRelativeDiv.appendChild(button);
+                    col3Div.appendChild(positionRelativeDiv);
+                    rowDiv.appendChild(col3Div);
+
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'col';
+
+                    const innerRowDiv = document.createElement('div');
+                    innerRowDiv.className = 'row';
+
+                    const formGroupDiv = document.createElement('div');
+                    formGroupDiv.className = 'form-group row mb-3';
+
+                    const label = document.createElement('label');
+                    label.htmlFor = `newTag-${index}`;
+                    label.className = 'col-sm-2 col-form-label';
+                    label.innerText = 'Add New Tag:';
+
+                    const colSm8Div = document.createElement('div');
+                    colSm8Div.className = 'col-sm-8';
+
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.name = `newTag-${index}`;
+                    input.className = 'form-control';
+                    input.id = `newTag-${index}`;
+                    input.value = '#';
+                    input.placeholder = '';
+
+                    colSm8Div.appendChild(input);
+
+                    const colSm2Div = document.createElement('div');
+                    colSm2Div.className = 'col-sm-2';
+
+                    const addButton = document.createElement('button');
+                    addButton.type = 'button';
+                    addButton.className = 'btn btn-success';
+                    addButton.innerText = '+';
+                    addButton.onclick = function() {
+                        // Add your addNewTag function logic here
+                    };
+
+                    colSm2Div.appendChild(addButton);
+
+                    formGroupDiv.appendChild(label);
+                    formGroupDiv.appendChild(colSm8Div);
+                    formGroupDiv.appendChild(colSm2Div);
+
+                    innerRowDiv.appendChild(formGroupDiv);
+
+                    const tagsFormGroupDiv = document.createElement('div');
+                    tagsFormGroupDiv.className = 'form-group mb-4';
+
+                    const tagsLabel = document.createElement('label');
+                    tagsLabel.htmlFor = `tags-${index}`;
+                    tagsLabel.className = 'form-label';
+                    tagsLabel.innerText = 'Tags:';
+
+                    const select = document.createElement('select');
+                    select.name = `tags-${index}[]`;
+                    select.className = 'form-control';
+                    select.id = `tags-${index}`;
+                    select.multiple = true;
+                    select.required = true;
+
+                    tags.forEach(tag => {
+                        const option = document.createElement('option');
+                        option.value = tag.id;
+                        option.innerText = tag.name;
+                        select.appendChild(option);
+                    });
+
+                    tagsFormGroupDiv.appendChild(tagsLabel);
+                    tagsFormGroupDiv.appendChild(select);
+
+                    innerRowDiv.appendChild(tagsFormGroupDiv);
+
+                    colDiv.appendChild(innerRowDiv);
+                    rowDiv.appendChild(colDiv);
+
+                    thumbnails.appendChild(rowDiv);
                 };
                 reader.readAsDataURL(file);
             });
@@ -217,7 +318,7 @@
                 })
                 .then(data => {
                     if (data.message === 'Photo deleted successfully') {
-                        document.getElementById("photo-" + id).parentElement.parentElement.remove();
+                        document.getElementById("photo-" + id).parentElement.parentElement.parentElement.remove();
                     } else {
                         alert("Failed to delete the image!");
                     }
