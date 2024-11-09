@@ -11,11 +11,7 @@
             color: #3c3b3b;
             font-family: Arial, sans-serif;
         }
-        .container {
-            text-align: center;
-            margin-top: 100px;
-        }
-        h1 {
+        h2 {
             font-size: 2rem;
             font-weight: bold;
             color: #4e9f3d;
@@ -34,32 +30,34 @@
             margin-bottom: 30px;
         }
         .hero-image {
-        width: 700px;
-        height: auto;
-        max-height: 700px;
-        object-fit: cover;
-        border-radius: 5px;
+            width: 700px;
+            height: auto;
+            max-height: 700px;
+            object-fit: cover;
+            border-radius: 5px;
         }
     </style>
 </head>
-<body>
-    <div class="container mt-5">
-        <h1>Ada yang ingin kamu tambahkan?</h1>
-        
-        <!-- Button Show Product List -->
-        <a href="{{ route('product.list') }}"><button class="btn btn-primary">Show Product List</button></a>
+<body style="height: 100vh; display: flex; width: 100%; justify-content: center; align-items: center;">
+    <div class="border border-gray-400 rounded-md p-4 bg-white">
+        <h2>Ada yang ingin kamu tambahkan?</h2>
 
-        @if(Auth::check())
-            @if(Auth::user()->role == 'admin')
-                <!-- Button Add Product -->
-                <a href="{{ url('/product/add') }}"><button class="btn btn-warning ml-2">Add Product</button></a>
+        <div style="display: flex; justify-content: center; align-items: center; width: 100%; gap: 16px;">
+            <!-- Button Show Product List -->
+            <a href="{{ route('product.list') }}"><button class="w-100 btn btn-primary">Show Product List</button></a>
+
+            @if(Auth::check())
+                @if(Auth::user()->role == 'admin')
+                    <!-- Button Add Product -->
+                    <a href="{{ url('/product/add') }}"><button class="w-100 btn btn-warning ml-2">Add Product</button></a>
+                @endif
+                <!-- Button Logout -->
+                <a href="{{ route('logout') }}"><button class="w-100 btn btn-danger ml-2">Logout</button></a>
+            @else
+                <!-- Button Login -->
+                <a href="{{ route('login') }}"><button class="w-100 btn btn-success ml-2">Login</button></a>
             @endif
-            <!-- Button Logout -->
-            <a href="{{ route('logout') }}"><button class="btn btn-danger ml-2">Logout</button></a>
-        @else
-            <!-- Button Login -->
-            <a href="{{ route('login') }}"><button class="btn btn-success ml-2">Login</button></a>
-        @endif
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

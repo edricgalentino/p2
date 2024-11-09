@@ -68,10 +68,8 @@
                                 <span class="badge bg-danger">{{ $tag->name }}</span>
                                 @endforeach
                             </div>
-
                         </div>
                     @endforeach
-                    
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>

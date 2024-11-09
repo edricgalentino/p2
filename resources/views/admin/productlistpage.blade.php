@@ -5,51 +5,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product List</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #d8f3dc;
-            color: #3c3b3b;
-            font-family: Arial, sans-serif;
-        }
-    </style>
-
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <div class="container mt-5">
-        <h1 class="mb-4">Product List</h1>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Page Header -->
+        <div class="my-20 flex flex-col justify-center items-center">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Product List</h1>
+            <p class="text-gray-600">Browse through our collection of products</p>
+        </div>
 
-        <div class="row g-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach ($dataProduct as $item)
-            <div class="col-md-4">
-                <a href="{{ url('/product/detail/' . $item->id) }}" class="text-decoration-none text-dark">
-                    <div class="card">
-                        <img src="{{ asset('storage/' . $item->image) }}" class="card-img-top" alt="{{ $item->name }}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $item->name }}</h5>
-                            <p class="card-text"><strong>Condition:</strong> {{ ucfirst($item->condition) }}</p>
-                            <p class="card-text"><strong>Description:</strong> {{ $item->description }}</p>
-                            <p class="card-text"><strong>Price:</strong> Rp{{ number_format($item->price, 2) }}</p>
-                            <div class="mb-2">
-                                @foreach ($item->tags as $tag)
-                                <span class="badge bg-primary">{{ $tag->name }}</span>
-                                @endforeach
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <a href="{{ url('/product/detail/' . $item->id) }}">
+                        <div class="relative">
+                            <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}" class="w-full h-48 object-cover">
+                            <div class="absolute top-4 right-4">
+                                <span class="bg-green-500 text-white px-2 py-1 rounded-full text-sm">New</span>
                             </div>
-                            @if(Auth::check() && Auth::user()->role == 'admin')
-                            <div class="d-flex justify-content-end mt-5">
-                                <a href="{{ url('/product/' . $item->id . '/edit') }}" class="btn btn-warning me-3">Edit</a>
-                                <form action="{{ url('/product/' . $item->id . '/delete') }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger" onclick="return confirmDelete()">Delete</button>
-                                </form>
-                            </div>
-                            @endif
                         </div>
-                    </div>
-                </a>
-            </div>
+                        <div class="p-4">
+                            <h2 class="text-xl font-semibold text-gray-800 mb-2">{{ $item->name }}</h2>
+                            <p class="text-gray-600 mb-4">{{ $item->description }}</p>
+                            <div class="flex flex-col gap-4">
+                                <span class="text-xl font-bold text-blue-600">${{ number_format($item->price, 2) }}</span>
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach ($item->tags->take(4) as $tag)
+                                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">{{ $tag->name }}</span>
+                                    @endforeach
+                                </div>
+                                @if(Auth::check() && Auth::user()->role == 'admin')
+                                    <div class="flex justify-end gap-2">
+                                        <a href="{{ url('/product/' . $item->id . '/edit') }}" class="px-2 py-1 rounded border border-black bg-blue-200 text-black">Edit</a>
+                                        <form action="{{ url('/product/' . $item->id . '/delete') }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="px-2 py-1 rounded border border-black bg-red-200 text-black" onclick="return confirmDelete()">Delete</button>
+                                        </form>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </a>
+                </div>
             @endforeach
         </div>
 
@@ -64,11 +64,6 @@
             return confirm('Are you sure you want to delete this product?');
         }
     </script>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 
 </html>

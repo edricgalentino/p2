@@ -7,7 +7,9 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PhotoController;
 
 
-Route::get('/product', [ProductController::class, 'showlistPage'])->name('landing');
+Route::get('/product', function () {
+	return view('welcome');
+});
 Route::get('/product/list', [ProductController::class, 'showProductList'])->name('product.list');
 Route::get('/product/detail/{id}', [ProductController::class, 'detailProduct']);
 
